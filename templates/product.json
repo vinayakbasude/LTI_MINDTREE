@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "lti-product",
+      "settings": {
+        "pdp_header": ""
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

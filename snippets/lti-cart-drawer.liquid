@@ -1,0 +1,177 @@
+<!-- cart.liquid or cart-template.liquid -->
+<div id="lti-cart-drawer-overlay" class="lti-cart-drawer-overlay bg-[#000000a1] fixed top-0 right-0 h-screen z-[100]">
+  <div id="lti-cart-drawer" class="lti-cart-drawer h-screen">
+    <!-- Cart items -->
+    <div class="flex sticky top-0 p-6 border-b-[1px] border-solid border-black">
+      <h2 class="text-[1.6rem] leading-[2.4rem] ">Cart items</h2>
+      <span id="close-btn" class="absolute top-[1.6rem] right-[1.6rem]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+          <line
+            x1="18"
+            y1="6"
+            x2="6"
+            y2="18" />
+          <line
+            x1="6"
+            y1="6"
+            x2="18"
+            y2="18" />
+        </svg>
+
+      </span>
+    </div>
+    <div class="lti-cart-items px-[1.6rem] py-8 overflow-y-scroll h-full">
+      {% for item in cart.items %}
+        <lti-cart-item class="lti-cart-item border-b-[1px] border-solid border-black last:border-0 last:mb-40">
+          <div class="lti-cart-item-info flex relative">
+            <div class="lti-cart-item-image w-[9rem]">
+              <a href="{{ item.url }}" class="block">
+                <img src="{{ item.image.src | product_img_url: 'small' }}" alt="{{ item.title }}">
+              </a>
+
+              <button class="remove-cart-btn mt-4 w-fit text-center text-black cursor-pointer px-4 py-6" data-item-id="{{ item.id }}">Remove</button>
+            </div>
+            <div class="lti-cart-item-details relative">
+              <a href='{{item.url}}' class="">
+                {{ item.title }}
+              </a>
+              <p class="mx-2">
+                {{ item.price | money }}
+              </p>
+              <span class="flex border-[1px] border-solid border-black w-fit">
+                <button class="quantity-decrement px-2 py-4" data-item-id="{{ item.id }}">-</button>
+                <input
+                  type="text"
+                  min="1"
+                  value="{{ item.quantity }}"
+                  data-item-id="{{ item.id }}"
+                  class="quantity-input"
+                  readonly>
+                <button class="quantity-increment px-2 py-4" data-item-id="{{ item.id }}">+</button>
+              </span>
+            </div>
+
+            <div class="spinner-wrapper absolute top-0 left-0 w-[27rem] h-full bg-[#f9fafb47] justify-center items-center" data-item-id="{{ item.id }}" 
+            style="display: none;">
+              <span class="spinner rounded" ></span>
+            </div>
+
+          </div>
+        </lti-cart-item>
+      {% endfor %}
+    </div>
+
+    {% if cart.items.size > 0  %}
+      <div class="totals mt-auto absolute bottom-0 p-8 flex justify-between bg-white" role="status">
+        <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
+        <p class="totals__total-value ml-8">{{ cart.total_price | money_with_currency }}</p>
+      </div>
+    {% else %}
+      <div class="text-center my-auto h-full">
+        <div class="mt-[50%]">
+          <h2 class="text-[5rem] leading-[6.4rem] font-bold spacing-[0.2rem]">No items Added</h2>
+          <a href="/collections/all" class="">Continue Shopping</a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- JavaScript to handle cart updates -->
+<script src="{{'lti-cart-drawer.js' |  asset_url}}" defer></script>
+
+<style>
+  /* Cart drawer styles */
+  .lti-cart-drawer {
+    width: 300px;
+    position: relative;
+    left: 100%;
+    right: -100%;
+    overflow: hidden;
+    background-color: #fff;
+    transition: left 0.55s ease-in-out;
+    /* Adjust width as needed */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+
+  .lti-cart-drawer-overlay.show .lti-cart-drawer {
+    left: calc(100% - 30rem);
+  }
+
+  .lti-cart-drawer-overlay {
+    width: 0;
+    transition: width 0.5s ease-in-out;
+  }
+
+  .lti-cart-drawer-overlay.show {
+    width: 100%;
+  }
+
+  .lti-cart-items {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lti-cart-item {
+    display: flex;
+    margin-bottom: 15px;
+  }
+
+  .lti-cart-item-image img {
+    width: 8rem;
+    height: 8rem;
+    margin-right: 10px;
+  }
+
+  .lti-cart-item-details {
+    width: calc(100% - 9rem);
+  }
+
+  .lti-lti-cart-item-details span {
+    margin-right: 10px;
+  }
+
+  .quantity-input {
+    width: 40px;
+    text-align: center;
+  }
+
+  .spinner {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* Loader styles */
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinner::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+
+</style>
