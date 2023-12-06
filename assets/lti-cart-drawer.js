@@ -2,6 +2,7 @@ let cartDrawerWidget = document.getElementById('lti-cart-drawer');
 let cartDrawerOverlay;
 let body;
 
+
 function getSectionDOM(html, selector = '.shopify-section') {
   return new DOMParser().parseFromString(html, 'text/html').querySelector(selector).innerHTML;
 }
