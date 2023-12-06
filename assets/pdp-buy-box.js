@@ -5,6 +5,7 @@ function getSectionDOM(html, selector = '.shopify-section') {
   return new DOMParser().parseFromString(html, 'text/html').querySelector(selector).innerHTML;
 }
 
+
 const swiper = new Swiper('.swiper', {
   slidesPerView: 'auto',
   spaceBetween: 16,
