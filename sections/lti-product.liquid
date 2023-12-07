@@ -1,218 +1,189 @@
-<div class="pdp-wrapper lg:flex lg:flex-row-reverse">
-  <div class="swiper pdp-image-gallery lg:!w-2/4">
-    <div class="swiper-wrapper">
-      {% for image in product.images %}
-        <div class="swiper-slide pdp-image first:pl-[1.6rem] first:lg:pl-0 last:pr-[1.6rem] last:lg:pr-0">
-          <picture>
-            <img
-              src="{{ image | image_url }}"
-              width="100%"
-              height="100%"
-              class="fit-image" />
-          </picture>
-        </div>
-      {% endfor %}
+<!-- cart.liquid or cart-template.liquid -->
+<div id="lti-cart-drawer-overlay" class="lti-cart-drawer-overlay bg-[#000000a1] fixed top-0 right-0 h-screen z-[100]">
+  <div id="lti-cart-drawer" class="lti-cart-drawer h-screen">
+    <!-- Cart items -->
+    <div class="flex sticky top-0 p-6 border-b-[1px] border-solid border-black">
+      <h2 class="text-[1.6rem] leading-[2.4rem] ">Cart items</h2>
+      <span id="close-btn" class="absolute top-[1.6rem] right-[1.6rem]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+          <line
+            x1="18"
+            y1="6"
+            x2="6"
+            y2="18" />
+          <line
+            x1="6"
+            y1="6"
+            x2="18"
+            y2="18" />
+        </svg>
+
+      </span>
     </div>
-    <div class="swiper-pagination relative top-auto mt-4"></div>
+    {% if cart.items.size > 0 %}
+      <div class="lti-cart-items px-[1.6rem] py-8 overflow-y-scroll h-full">
+        {% for item in cart.items %}
+          <lti-cart-item class="lti-cart-item border-b-[1px] border-solid border-black last:border-0 last:mb-40">
+            <div class="lti-cart-item-info flex relative">
+              <div class="lti-cart-item-image w-[9rem]">
+                <a href="{{ item.url }}" class="block">
+                  <img src="{{ item.image.src | product_img_url: 'small' }}" alt="{{ item.title }}">
+                </a>
 
-    <!-- If we need navigation buttons -->
-    <div class="swiper-button-prev lg:!block"></div>
-    <div class="swiper-button-next lg:!block"></div>
-  </div>
+                <button class="remove-cart-btn mt-4 w-fit text-center text-black cursor-pointer px-4 py-6" data-item-id="{{ item.id }}">Remove</button>
+              </div>
+              <div class="lti-cart-item-details relative">
+                <a href='{{item.url}}' class="">
+                  {{ item.title }}
+                </a>
+                <p class="mx-2">
+                  {{ item.price | money }}
+                </p>
+                <span class="flex border-[1px] border-solid border-black w-fit">
+                  <button class="quantity-decrement px-2 py-4" data-item-id="{{ item.id }}">-</button>
+                  <input
+                    type="text"
+                    min="1"
+                    value="{{ item.quantity }}"
+                    data-item-id="{{ item.id }}"
+                    class="quantity-input"
+                    readonly>
+                  <button class="quantity-increment px-2 py-4" data-item-id="{{ item.id }}">+</button>
+                </span>
+              </div>
 
-  <div class="lg:!w-2/4 py-[3.2rem] px-[1.6rem] lg:py-[6.4rem] lg:px-16">
+              <div
+                class="spinner-wrapper absolute top-0 left-0 w-[27rem] h-full bg-[#f9fafb47] justify-center items-center"
+                data-item-id="{{ item.id }}"
+                style="display: none;">
+                <span class="spinner rounded"></span>
+              </div>
 
-    <h1 class="text-[2.4rem] leading-[3.2rem] lg:text-[4rem] lg:leading-[6.4rem]">
-      {{ product.title }}
-    </h1>
+            </div>
+          </lti-cart-item>
+        {% endfor %}
+      </div>
 
-    <p>
-      {{ product.description }}
-    </p>
-
-    <p class="m-0 text-[1.6rem] leading-[2.4rem] lg:text-[1.8rem]">{{ product.price | money_with_currency }}</p>
-
-    {% if product.variants.size > 1 %}
-      {% for _variant in product.options_with_values %}
-        <div class="mt-8">
-
-          <h2 class="my-0 mb-4">{{ _variant.name }}</h2>
-
-          {% for _variant_opt in _variant.values %}
-            <label for="{{ _variant_opt }}">
-              <input
-                type="radio"
-                data-variant-{{_variant.name | downcase}}
-                id="{{ _variant_opt }}"
-                value="{{ _variant_opt }}"
-                name="{{ _variant.name }}"
-                {% if forloop.first %}
-                checked
-                {% endif %}>
-              {{ _variant_opt }}
-            </label>
-          {% endfor %}
+      <div class="totals mt-auto absolute bottom-0 p-8 bg-white" role="status">
+        <div class="flex justify-between">
+          <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
+          <p class="totals__total-value ml-8">{{ cart.total_price | money_with_currency }}</p>
         </div>
-      {% endfor %}
+
+        {% form 'cart'
+          , cart %}
+          <button
+            type="submit"
+            name="checkout"
+            class="bg-sky-900 flex justify-center items-center text-white py-4 lg:px-24 mt-8 uppercase ml-4 w-[25rem]">Checkout</button>
+        {% endform %}
+      </div>
+    {% else %}
+      <div class="text-center my-auto h-full">
+        <div class="mt-[50%]">
+          <h2 class="text-[5rem] leading-[6.4rem] font-bold spacing-[0.2rem]">No items Added</h2>
+          <a href="/collections/all" class="">Continue Shopping</a>
+        </div>
+      </div>
     {% endif %}
 
-    <div class="flex">
-      <pdp-quantity class="flex border-[1px] border-solid border-black w-fit mt-8">
-        <button
-          class="quantity__button no-js-hidden"
-          name="minus"
-          type="button"
-          id="decrement-quantity">
-          <span class="visually-hidden">
-            {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
-          </span>
-          {% render 'icon-minus' %}
-        </button>
-        <input
-          class="quantity__input w-[4rem] text-[1.6rem] lg:text-[2rem]"
-          type="number"
-          name="quantity"
-          id="pdp-quantity"
-          value="1"
-          readonly />
-        <button
-          class="quantity__button no-js-hidden"
-          name="plus"
-          type="button"
-          id="increment-quantity">
-          <span class="visually-hidden">
-            {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
-          </span>
-          {% render 'icon-plus' %}
-        </button>
-      </pdp-quantity>
-      <input
-        name="id"
-        type="hidden"
-        id="variant-id"
-        value="{{ product.selected_or_first_available_variant.id }}">
-
-      <button id="add-to-cart" class="bg-sky-900 flex justify-center items-center text-white py-4 lg:px-24 mt-8 uppercase ml-4 w-full">Add to cart</button>
-    </div>
   </div>
 </div>
 
-<script src="{{'pdp-buy-box.js' |  asset_url}}"  defer></script>
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org/",
-    "@type": "Product",
-    "name": {{ product.title | json }},
-    "url": {{ request.origin | append: product.url | json }},
-    {% if seo_media -%}
-      "image" : [{{ seo_media | image_url: width: 1920 | prepend: "https:" | json }}],
-      {%- endif %}
-      "description": {{ product.description | strip_html | json }},
-      {% if product.selected_or_first_available_variant.sku != blank -%}
-        "sku": {{ product.selected_or_first_available_variant.sku | json }},
-        {%- endif %}
-        "brand": {
-          "@type": "Brand",
-          "name": {{ product.vendor | json }}
-        },
-        "offers": [
-                  {%- for variant in product.variants -%}
-            {
-                      "@type": "Offer",
-                      {%- if variant.sku != blank -%}
-                "sku": {{ variant.sku | json }},
-                      {%- endif -%}
-                {%- if variant.barcode.size == 12 -%}
-                  "gtin12": {{ variant.barcode }},
-                      {%- endif -%}
-                  {%- if variant.barcode.size == 13 -%}
-                    "gtin13": {{ variant.barcode }},
-                      {%- endif -%}
-                    {%- if variant.barcode.size == 14 -%}
-                      "gtin14": {{ variant.barcode }},
-                      {%- endif -%}
-                      "availability": "http://schema.org/{% if variant.available %} InStock{% else %}OutOfStock{% endif %}",
-                      "price": {{ variant.price | divided_by: 100.00 | json }},
-                      "priceCurrency": {{ cart.currency.iso_code | json }},
-                      "url": {{ request.origin | append: variant.url | json }}
-                    }{% unless forloop.last %},{% endunless %}
-                  {%- endfor -%}
-                ]
-              }
-</script>
-
-<script>
-  var variants = {
-    {% for _variant_id in product.variants %}
-      {{ _variant_id.title | json | replace: " \/ " , '-' }} : {{ _variant_id.id }}{% unless forloop.last == true %},{% endunless %}
-    {% endfor %}
-  }
-</script>
-
+<!-- JavaScript to handle cart updates -->
+<script src="{{'lti-cart-drawer.js' |  asset_url}}" defer></script>
 
 <style>
-  .swiper,
-  .pdp-image-gallery {
+  /* Cart drawer styles */
+  .lti-cart-drawer {
+    width: 300px;
+    position: relative;
+    left: 100%;
+    right: -100%;
+    overflow: hidden;
+    background-color: #fff;
+    transition: left 0.55s ease-in-out;
+    /* Adjust width as needed */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+
+  .lti-cart-drawer-overlay.show .lti-cart-drawer {
+    left: calc(100% - 30rem);
+  }
+
+  .lti-cart-drawer-overlay {
+    width: 0;
+    transition: width 0.5s ease-in-out;
+  }
+
+  .lti-cart-drawer-overlay.show {
     width: 100%;
   }
 
-  .pdp-image {
-    width: 28.4rem;
-    height: 28.4rem;
+  .lti-cart-items {
+    display: flex;
+    flex-direction: column;
   }
 
-  .fit-image {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
+  .lti-cart-item {
+    display: flex;
+    margin-bottom: 15px;
   }
 
-  .swiper-wrapper {
-    height: calc(100% - 4rem);
-    margin-top: 1rem;
+  .lti-cart-item-image img {
+    width: 8rem;
+    height: 8rem;
+    margin-right: 10px;
   }
 
-  @media (min-width: 1024px) {
-    .pdp-image {
-      width: 62.4rem;
-      height: 62.4rem;
+  .lti-cart-item-details {
+    width: calc(100% - 9rem);
+  }
+
+  .lti-lti-cart-item-details span {
+    margin-right: 10px;
+  }
+
+  .quantity-input {
+    width: 40px;
+    text-align: center;
+  }
+
+  .spinner {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* Loader styles */
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
     }
   }
 
-</style>
-
-{% schema %}
-  {
-    "name": "LTI PDP Demo",
-    "settings": [
-      {
-        "type": "text",
-        "id": "pdp_header",
-        "label": "Header"
-      }
-    ],
-    "blocks": [
-      {
-        "name": "Recommendations",
-        "type": "Recommendations",
-        "settings": [
-          {
-            "type": "product",
-            "id": "product_details",
-            "label": "Product details"
-          },
-          {
-            "type": "text",
-            "id": "short_description",
-            "label": "Product short description"
-          }
-        ]
-      }
-    ],
-    "presets": [
-      {
-        "name": "LTI_PDP"
-      }
-    ]
+  .spinner::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-left: 5px;
   }
-{% endschema %}
+
+</style>
