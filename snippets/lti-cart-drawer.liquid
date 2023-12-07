@@ -1,4 +1,4 @@
-
+<!-- cart.liquid or cart-template.liquid -->
 <div id="lti-cart-drawer-overlay" class="lti-cart-drawer-overlay bg-[#000000a1] fixed top-0 right-0 h-screen z-[100]">
   <div id="lti-cart-drawer" class="lti-cart-drawer h-screen">
     <!-- Cart items -->
@@ -71,10 +71,17 @@
     </div>
 
     {% if cart.items.size > 0  %}
-      <div class="totals mt-auto absolute bottom-0 p-8 flex justify-between bg-white" role="status">
-        <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
-        <p class="totals__total-value ml-8">{{ cart.total_price | money_with_currency }}</p>
+      <div class="totals mt-auto absolute bottom-0 p-8 bg-white" role="status">
+        <div class="flex justify-between">
+          <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
+            <p class="totals__total-value ml-8">{{ cart.total_price | money_with_currency }}</p>
+        </div>
+
+        {% form 'cart', cart %}
+          <button type="submit" name="checkout" class="bg-sky-900 flex justify-center items-center text-white py-4 lg:px-24 mt-8 uppercase ml-4 w-[25rem]">Checkout</button>
+        {% endform %}
       </div>
+
     {% else %}
       <div class="text-center my-auto h-full">
         <div class="mt-[50%]">
